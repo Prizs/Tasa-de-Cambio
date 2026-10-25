@@ -932,59 +932,31 @@ async function downloadAllFlyersMobile() {
   const flyers = currentRatesData.flyers;
   const btn = document.getElementById("btnDownloadMobile");
   const origText = btn ? btn.innerHTML : "";
-  if (btn) btn.innerHTML = "⏳ Generando fotos...";
+  if (btn) btn.innerHTML = "⏳ Descargando fotos...";
 
   try {
-    const filesToShare = [];
-
     for (let i = 0; i < flyers.length; i++) {
       const flyer = flyers[i];
       const offscreen = document.createElement("canvas");
-      const highResScale = 1.0;
-      window.FlyerRenderer.renderToCanvas(offscreen, flyer, highResScale);
+      // Scale 2.0 for crisp HD quality (1600x2400)
+      window.FlyerRenderer.renderToCanvas(offscreen, flyer, 2.0);
 
       const blob = await new Promise(resolve => offscreen.toBlob(resolve, "image/png"));
       const flyerName = flyer.id ? flyer.id.replace('flyer_', '').toUpperCase() : `FLYER_${i+1}`;
       const fileName = `Flyer_${flyerName}_${new Date().toISOString().slice(0, 10)}.png`;
 
-      // Check Web Share with files support (iOS Safari & Android Chrome)
-      if (navigator.canShare && navigator.canShare({ files: [new File([blob], fileName, { type: "image/png" })] })) {
-        filesToShare.push(new File([blob], fileName, { type: "image/png" }));
-      } else {
-        // Direct individual sequential download
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = fileName;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        setTimeout(() => URL.revokeObjectURL(url), 1000);
-        await new Promise(r => setTimeout(r, 400));
-      }
-    }
+      // Direct sequential download into Downloads/Photos folder
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 2000);
 
-    if (filesToShare.length > 0 && navigator.share) {
-      try {
-        await navigator.share({
-          title: "Flyers de Tasas de Cambio - Envíos YA!",
-          text: "Tasas del día actualizadas",
-          files: filesToShare
-        });
-      } catch (err) {
-        if (err.name !== "AbortError") {
-          for (let f of filesToShare) {
-            const url = URL.createObjectURL(f);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = f.name;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            await new Promise(r => setTimeout(r, 350));
-          }
-        }
-      }
+      // Brief pause between downloads so browser saves each image without blocking
+      await new Promise(r => setTimeout(r, 450));
     }
 
     // Save benchmark snapshot
@@ -1004,7 +976,7 @@ async function downloadAllFlyersMobile() {
     });
 
   } catch (err) {
-    console.error("Error al descargar fotos móviles:", err);
+    console.error("Error al descargar fotos individuales:", err);
     alert("Error al descargar fotos.");
   } finally {
     if (btn) btn.innerHTML = origText;
