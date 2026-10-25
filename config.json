@@ -58,6 +58,17 @@
           "margin_pref": 10.0
         },
         {
+          "destination_fiat": "CLP",
+          "name": "Chile",
+          "flag": "chile",
+          "tradeType": "SELL",
+          "minAmount": 100000,
+          "payTypes": [],
+          "roundDecimals": 0,
+          "margin": 12.0,
+          "margin_pref": 12.0
+        },
+        {
           "destination_fiat": "COP",
           "name": "Colombia",
           "flag": "colombia",
@@ -87,17 +98,6 @@
           "minAmount": 500,
           "payTypes": [],
           "roundDecimals": 2,
-          "margin": 12.0,
-          "margin_pref": 12.0
-        },
-        {
-          "destination_fiat": "CLP",
-          "name": "Chile",
-          "flag": "chile",
-          "tradeType": "SELL",
-          "minAmount": 100000,
-          "payTypes": [],
-          "roundDecimals": 0,
           "margin": 12.0,
           "margin_pref": 12.0
         },
@@ -312,15 +312,16 @@
           "margin_pref": 6.3
         },
         {
-          "destination_fiat": "PEN",
-          "name": "Perú",
-          "flag": "peru",
-          "tradeType": "SELL",
-          "minAmount": 300,
+          "destination_fiat": "USD",
+          "name": "Estados Unidos",
+          "flag": "usa",
+          "tradeType": "BUY",
+          "calc_mode": "origin_plus_percent",
+          "minAmount": 50,
           "payTypes": [],
-          "roundDecimals": 4,
-          "margin": 7.0,
-          "margin_pref": 6.3
+          "roundDecimals": 0,
+          "margin": 8.0,
+          "margin_pref": 8.0
         },
         {
           "destination_fiat": "COP",
@@ -330,6 +331,17 @@
           "minAmount": 350000,
           "payTypes": [],
           "roundDecimals": 2,
+          "margin": 7.0,
+          "margin_pref": 6.3
+        },
+        {
+          "destination_fiat": "PEN",
+          "name": "Perú",
+          "flag": "peru",
+          "tradeType": "SELL",
+          "minAmount": 300,
+          "payTypes": [],
+          "roundDecimals": 4,
           "margin": 7.0,
           "margin_pref": 6.3
         },
@@ -354,18 +366,6 @@
           "roundDecimals": 4,
           "margin": 7.0,
           "margin_pref": 6.3
-        },
-        {
-          "destination_fiat": "USD",
-          "name": "Estados Unidos",
-          "flag": "usa",
-          "tradeType": "BUY",
-          "calc_mode": "origin_plus_percent",
-          "minAmount": 50,
-          "payTypes": [],
-          "roundDecimals": 0,
-          "margin": 8.0,
-          "margin_pref": 8.0
         }
       ]
     },

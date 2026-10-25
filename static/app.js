@@ -266,6 +266,22 @@ function renderDriftMonitor(data) {
   const topRiskCorridors = [];
 
   data.flyers.forEach(flyer => {
+    const col = document.createElement("div");
+    col.className = "drift-country-column";
+
+    col.innerHTML = `
+      <div class="drift-country-header">
+        <div class="drift-country-header-title">
+          <span>${getFlagEmoji(flyer.origin.fiat)}</span>
+          <span>${flyer.title}</span>
+        </div>
+        <span class="drift-country-badge">${flyer.corridors.length} tasas</span>
+      </div>
+    `;
+
+    const cardsStack = document.createElement("div");
+    cardsStack.className = "drift-country-cards";
+
     flyer.corridors.forEach(corridor => {
       if (corridor.drift) {
         const d = corridor.drift;
@@ -293,7 +309,7 @@ function renderDriftMonitor(data) {
           <div class="drift-card-corridor">
             <div class="drift-flag-pair">
               <span>${getFlagEmoji(flyer.origin.fiat)}</span>
-              <span style="font-size:0.8rem; margin:0 4px; color:#9ca3af;">➔</span>
+              <span style="font-size:0.75rem; margin:0 3px; color:#9ca3af;">➔</span>
               <span>${getFlagEmoji(corridor.destination_fiat)}</span>
             </div>
             <div>
@@ -302,13 +318,16 @@ function renderDriftMonitor(data) {
             </div>
           </div>
           <div class="drift-metric">
-            <span class="drift-badge ${badgeClass}">${sign}${d.margin_diff}% Margen</span>
-            <div class="drift-margin-note">Efectivo: ${d.effective_margin_now}% (Base: ${d.nominal_margin}%)</div>
+            <span class="drift-badge ${badgeClass}">${sign}${d.margin_diff}%</span>
+            <div class="drift-margin-note">Efec: ${d.effective_margin_now}%</div>
           </div>
         `;
-        driftCardsContainer.appendChild(card);
+        cardsStack.appendChild(card);
       }
     });
+
+    col.appendChild(cardsStack);
+    driftCardsContainer.appendChild(col);
   });
 
   // Urgent Banner & Sound/Notification alert
