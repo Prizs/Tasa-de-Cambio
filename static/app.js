@@ -138,6 +138,13 @@ function playAlertChime() {
   }
 }
 
+function isWithinVenezuelaHours() {
+  const now = new Date();
+  const utcHours = now.getUTCHours();
+  const vetHour = (utcHours - 4 + 24) % 24;
+  return vetHour >= 8 && vetHour < 20;
+}
+
 function triggerAlert(dangerCount, topRiskCorridors) {
   playAlertChime();
 
@@ -155,7 +162,12 @@ function triggerAlert(dangerCount, topRiskCorridors) {
     });
   }
 
-  // Send alert to Telegram group automatically
+  // Send alert to Telegram group ONLY between 8:00 AM and 8:00 PM (Venezuela time)
+  if (!isWithinVenezuelaHours()) {
+    console.log("[Horario] Alerta automática de grupo omitida: fuera del horario laboral de Venezuela (8:00 AM a 8:00 PM VET).");
+    return;
+  }
+
   fetch("/api/telegram/notify-alert", {
     method: "POST",
     headers: { "Content-Type": "application/json" },

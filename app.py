@@ -2,6 +2,7 @@ import os
 import io
 import time
 import zipfile
+from datetime import datetime, timezone, timedelta
 from fastapi import FastAPI, HTTPException, Body
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse
@@ -12,6 +13,12 @@ import requests
 import calculator_service
 from calculator_service import compute_all_rates, save_snapshot, load_config, save_config, load_snapshot
 from telegram_service import send_telegram_message, send_telegram_photo
+
+def is_within_business_hours_vet() -> bool:
+    """Checks if current time in Venezuela (UTC-4) is between 08:00 and 20:00."""
+    vet = timezone(timedelta(hours=-4))
+    now_vet = datetime.now(vet)
+    return 8 <= now_vet.hour < 20
 
 app = FastAPI(title="Calculadora de Tasas & Generador de Flyers P2P", version="1.0.0")
 
@@ -106,6 +113,14 @@ def test_telegram(payload: dict = Body(...)):
 
 @app.post("/api/telegram/notify-alert")
 def notify_telegram_alert(payload: dict = Body(...)):
+    force = payload.get("force", False)
+    if not force and not is_within_business_hours_vet():
+        vet = timezone(timedelta(hours=-4))
+        now_str = datetime.now(vet).strftime("%I:%M %p")
+        return {
+            "success": False,
+            "message": f"Alerta omitida: Fuera del horario permitido de Venezuela (8:00 AM a 8:00 PM). Hora actual: {now_str} VET."
+        }
     cfg = load_config()
     tg = cfg.get("telegram", {})
     if not tg.get("enabled"):
