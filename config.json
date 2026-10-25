@@ -12,7 +12,7 @@
   "telegram": {
     "enabled": true,
     "bot_token": "8944429840:AAEuGwp1UMrvrOUDIDL5kJb4Mdkf9CCO7sE",
-    "chat_id": "669707776",
+    "chat_id": "-5399691025",
     "alert_on_danger": true
   },
   "flyers": [
