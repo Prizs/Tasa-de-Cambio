@@ -152,12 +152,14 @@ const FlyerRenderer = {
     ctx.font = `italic 900 ${38 * s}px "Arial Black", Impact, sans-serif`;
     ctx.fillText("SEGURO Y RESPONSABLE!", w * 0.5, 375 * s);
 
-    // Line 3: ¡LA MEJOR TASA Y RAPIDEZ!
-    ctx.font = `italic 900 ${31 * s}px "Arial Black", Impact, sans-serif`;
+    // Line 3: Flyer sub_promo or default
+    const line3Text = flyer.sub_promo || "¡LA MEJOR TASA Y RAPIDEZ!";
+    const fontSize = line3Text.length > 28 ? (26 * s) : (31 * s);
+    ctx.font = `italic 900 ${fontSize}px "Arial Black", Impact, sans-serif`;
     ctx.fillStyle = "#FBBF24";
     ctx.shadowColor = "#D97706";
     ctx.shadowBlur = 5 * s;
-    ctx.fillText("¡LA MEJOR TASA Y RAPIDEZ!", w * 0.5, 432 * s);
+    ctx.fillText(line3Text, w * 0.5, 432 * s);
     ctx.restore();
 
     return 465 * s;

@@ -90,11 +90,33 @@ def record_snapshot(payload: dict = Body(default={})):
         flyer_id = payload.get("flyer_id") if isinstance(payload, dict) else None
         data = compute_all_rates()
         snapshot = save_snapshot(data.get("_snapshot_payload", {}), flyer_id=flyer_id)
+
+        # Recalculate drift in data so it reflects the new reference point immediately
+        for flyer in data.get("flyers", []):
+            f_id = flyer.get("flyer_id")
+            if flyer_id and f_id != flyer_id:
+                continue
+            for corr in flyer.get("corridors", []):
+                corr["drift"] = {
+                    "old_rate_standard": corr.get("rate_standard"),
+                    "drift_acq_pct": 0.0,
+                    "effective_margin_now": corr.get("margin_std", 7.0),
+                    "nominal_margin": corr.get("margin_std", 7.0),
+                    "margin_diff": 0.0,
+                    "status": "safe"
+                }
+        data["snapshot_info"] = {
+            "has_snapshot": True,
+            "snapshot_time": snapshot.get("readable_time"),
+            "snapshot_age_seconds": 0
+        }
+
         target = f"del flyer {flyer_id}" if flyer_id else "global de todos los flyers"
         return {
             "success": True,
             "message": f"Snapshot {target} guardado exitosamente.",
-            "snapshot": snapshot
+            "snapshot": snapshot,
+            "rates_data": data
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

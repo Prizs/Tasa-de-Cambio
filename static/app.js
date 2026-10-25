@@ -50,13 +50,29 @@ function setupEventListeners() {
   }
 
   btnRefresh.addEventListener("click", async () => {
-    // Manually clicking "Actualizar Tasas" syncs Binance, resets benchmark, and clears alert
-    await saveBenchmarkSnapshot(false, null);
-    fetchRates(true);
+    btnRefresh.disabled = true;
+    const origHTML = btnRefresh.innerHTML;
+    btnRefresh.innerHTML = `
+      <svg class="spin-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.19"/></svg>
+      Actualizando...
+    `;
+    // Immediately clear alert from UI so user gets instant confirmation
+    if (urgentAlertContainer) urgentAlertContainer.innerHTML = "";
+    lastNotifiedDangerCount = 0;
+
+    try {
+      await saveBenchmarkSnapshot(false, null);
+    } catch (err) {
+      console.error("Error refreshing rates:", err);
+      await fetchRates(true);
+    } finally {
+      btnRefresh.innerHTML = origHTML;
+      btnRefresh.disabled = false;
+    }
   });
 
   btnSaveSnapshot.addEventListener("click", () => {
-    saveBenchmarkSnapshot();
+    saveBenchmarkSnapshot(true);
   });
 
   const btnTgFlyers = document.getElementById("btnSendTelegramFlyers");
@@ -315,7 +331,7 @@ function renderDriftMonitor(data) {
             </div>
           </div>
           <div class="urgent-alert-actions" style="display:flex; gap:10px; flex-wrap:wrap;">
-            <button class="btn btn-warning" onclick="saveBenchmarkSnapshot(true, null)" style="background:#f59e0b; border-color:#d97706; color:#000; font-weight:800;" title="Acepta las tasas actuales como nuevo punto de referencia y elimina este mensaje sin descargar">
+            <button class="btn btn-warning" onclick="saveBenchmarkSnapshot(false, null)" style="background:#f59e0b; border-color:#d97706; color:#000; font-weight:800;" title="Acepta las tasas actuales como nuevo punto de referencia y elimina este mensaje sin descargar">
               🔄 Aceptar Tasas y Quitar Alerta
             </button>
             <button class="btn btn-primary" onclick="downloadAllFlyersZip()" style="box-shadow: 0 4px 14px rgba(0,0,0,0.4);">
@@ -387,10 +403,18 @@ function renderFlyersGallery(flyers) {
         corridorBadge = `<span style="color:#f59e0b; font-size:0.75rem; margin-left:6px;">⚠️</span>`;
       }
 
+      const isChile = flyer.id === "flyer_chile" || (flyer.origin && flyer.origin.fiat === "CLP");
+      const prefText = (isChile && c.rate_preferential && c.rate_preferential !== c.rate_standard)
+        ? `<span style="font-size:0.74rem; color:#38bdf8; margin-left:6px; font-weight:600;" title="Tasa preferencial a partir de 100k pesos">(Pref +100k: ${window.FlyerRenderer ? window.FlyerRenderer.formatRateSmart(c.rate_preferential) : c.rate_preferential})</span>`
+        : "";
+
       corridorsListHtml += `
         <div class="flyer-corridor-item">
           <span>${getFlagEmoji(c.destination_fiat)} ${c.name} ${corridorBadge}</span>
-          <span style="font-weight:700; color:#fbbf24;">${window.FlyerRenderer ? window.FlyerRenderer.formatRateSmart(c.rate_standard) : c.rate_standard}</span>
+          <div style="text-align:right;">
+            <span style="font-weight:700; color:#fbbf24;">${window.FlyerRenderer ? window.FlyerRenderer.formatRateSmart(c.rate_standard) : c.rate_standard}</span>
+            ${prefText}
+          </div>
         </div>
       `;
     });
@@ -619,7 +643,7 @@ async function downloadAllFlyersZip() {
     link.download = `Flyers_EnviosYa_${dateStr}.zip`;
     link.click();
 
-    await saveBenchmarkSnapshot(true, null);
+    await saveBenchmarkSnapshot(false, null);
   } catch (err) {
     console.error("Error creating ZIP:", err);
     alert("Error al empaquetar los flyers en ZIP.");
@@ -631,8 +655,16 @@ async function downloadAllFlyersZip() {
     btnDownloadAll.disabled = false;
   }
 }
+window.downloadAllFlyersZip = downloadAllFlyersZip;
 
 async function saveBenchmarkSnapshot(showMessage = true, flyerId = null) {
+  // Instantly clear red alert from DOM
+  if (urgentAlertContainer) urgentAlertContainer.innerHTML = "";
+  lastNotifiedDangerCount = 0;
+
+  syncText.textContent = "Actualizando tasas y referencia...";
+  syncStatus.style.borderColor = "#f59e0b";
+
   try {
     const payload = flyerId ? { flyer_id: flyerId } : {};
     const res = await fetch("/api/snapshot/save", {
@@ -641,14 +673,29 @@ async function saveBenchmarkSnapshot(showMessage = true, flyerId = null) {
       body: JSON.stringify(payload)
     });
     if (!res.ok) throw new Error("Error al guardar snapshot");
-    if (showMessage) {
-      alert(flyerId ? `✅ Punto de referencia fijado para el flyer seleccionado.` : "✅ Punto de referencia fijado para todos los flyers.");
+    const result = await res.json();
+
+    if (result.rates_data) {
+      currentRatesData = result.rates_data;
+      renderDashboard(result.rates_data);
+    } else {
+      await fetchRates(false);
     }
-    fetchRates();
+
+    syncText.textContent = `Actualizado ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`;
+    syncStatus.style.borderColor = "#10b981";
+    countdownSeconds = 60;
+
+    if (showMessage) {
+      alert(flyerId ? `✅ Punto de referencia fijado para el flyer seleccionado.` : "✅ Tasas actualizadas y nuevo punto de referencia fijado exitosamente.");
+    }
   } catch (e) {
-    console.error(e);
+    console.error("Error saving benchmark snapshot:", e);
+    syncText.textContent = "Error al actualizar";
+    syncStatus.style.borderColor = "#ef4444";
   }
 }
+window.saveBenchmarkSnapshot = saveBenchmarkSnapshot;
 
 // Telegram Test Button Listener
 document.addEventListener("DOMContentLoaded", () => {
@@ -717,7 +764,11 @@ async function sendAllFlyersToTelegram() {
       const dataUrl = offCanvas.toDataURL("image/png");
 
       let summaryList = f.corridors.map(c => `* ${c.destination_fiat} (${c.name}): <b>${formatNumber(c.rate_standard)}</b>`).join("\n");
-      const caption = `📊 <b>${f.title} - Envíos YA!</b>\n\n${summaryList}\n\n<b>*Consultar cuenta antes de transferir*</b>\n📲 WhatsApp: ${f.whatsapp || "+56 973614725"}`;
+      let prefNote = "";
+      if (f.id === "flyer_chile" || (f.origin && f.origin.fiat === "CLP")) {
+        prefNote = "\n\n⭐ <b>Tasa preferencial a partir de 100k pesos</b>";
+      }
+      const caption = `📊 <b>${f.title} - Envíos YA!</b>\n\n${summaryList}${prefNote}\n\n<b>*Consultar cuenta antes de transferir*</b>\n📲 WhatsApp: ${f.whatsapp || "+56 973614725"}`;
 
       const res = await fetch("/api/telegram/send-photo", {
         method: "POST",
@@ -773,7 +824,11 @@ async function sendAllFlyersToWhatsApp() {
       const dataUrl = offCanvas.toDataURL("image/png");
 
       let summaryList = f.corridors.map(c => `* ${c.destination_fiat} (${c.name}): ${formatNumber(c.rate_standard)}`).join("\n");
-      const caption = `📊 *${f.title} - Envíos YA!*\n\n${summaryList}\n\n*Consultar cuenta antes de transferir*\n📲 WhatsApp: ${f.whatsapp || "+56 973614725"}`;
+      let prefNote = "";
+      if (f.id === "flyer_chile" || (f.origin && f.origin.fiat === "CLP")) {
+        prefNote = "\n\n⭐ *Tasa preferencial a partir de 100k pesos*";
+      }
+      const caption = `📊 *${f.title} - Envíos YA!*\n\n${summaryList}${prefNote}\n\n*Consultar cuenta antes de transferir*\n📲 WhatsApp: ${f.whatsapp || "+56 973614725"}`;
 
       const res = await fetch("/api/whatsapp/send-photo", {
         method: "POST",
@@ -1043,21 +1098,8 @@ async function downloadAllFlyersMobile() {
       await new Promise(r => setTimeout(r, 450));
     }
 
-    // Save benchmark snapshot
-    fetch("/api/snapshot/save", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({})
-    }).then(r => r.json()).then(res => {
-      if (res.snapshot && currentRatesData) {
-        currentRatesData.snapshot_info = {
-          has_snapshot: true,
-          snapshot_time: res.snapshot.readable_time,
-          snapshot_age_seconds: 0
-        };
-        fetchRates(false);
-      }
-    });
+    // Save benchmark snapshot and refresh UI cleanly
+    await saveBenchmarkSnapshot(false, null);
 
   } catch (err) {
     console.error("Error al descargar fotos individuales:", err);

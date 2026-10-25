@@ -1,90 +1,238 @@
 {
-  "timestamp": 1792886125.6093361,
-  "readable_time": "2026-10-24 19:55:25",
+  "timestamp": 1792936034.2902203,
+  "readable_time": "2026-10-25 09:47:14",
   "rates": {
     "flyer_zelle_USD_VES": {
-      "acquisition_rate": 958.8873830654832,
-      "rate_standard": 891.7652662508992,
-      "rate_preferential": 898.4774779323578,
-      "origin_price": 1.0422500000000001,
-      "dest_price": 999.4003749999999
-    },
-    "flyer_zelle_USD_CLP": {
-      "acquisition_rate": 952.1168145838329,
-      "rate_standard": 885.4686375629645,
-      "rate_preferential": 892.1334552650516,
-      "origin_price": 1.0422500000000001,
-      "dest_price": 992.34375
-    },
-    "flyer_zelle_USD_MXN": {
-      "acquisition_rate": 17.85680019189254,
-      "rate_standard": 16.60682417846006,
-      "rate_preferential": 16.73182177980331,
-      "origin_price": 1.0422500000000001,
-      "dest_price": 18.611250000000002
+      "acquisition_rate": 1000.4499999999999,
+      "rate_standard": 900.405,
+      "rate_preferential": 900.405,
+      "origin_price": 1.0,
+      "dest_price": 1000.4499999999999,
+      "snapshot_time": "2026-10-25 09:47:14"
     },
     "flyer_zelle_USD_COP": {
-      "acquisition_rate": 2990.8503238186613,
-      "rate_standard": 2781.490801151355,
-      "rate_preferential": 2802.426753418086,
-      "origin_price": 1.0422500000000001,
-      "dest_price": 3117.21375
+      "acquisition_rate": 3117.4075000000003,
+      "rate_standard": 2743.3186,
+      "rate_preferential": 2743.3186,
+      "origin_price": 1.0,
+      "dest_price": 3117.4075000000003,
+      "snapshot_time": "2026-10-25 09:47:14"
     },
-    "flyer_chile_CLP_VES": {
-      "acquisition_rate": 1.000124214900534,
-      "rate_standard": 0.9301155198574966,
-      "rate_preferential": 0.9371163893618004,
-      "origin_price": 999.2762500000001,
-      "dest_price": 999.4003749999999
+    "flyer_zelle_USD_PEN": {
+      "acquisition_rate": 3.469125,
+      "rate_standard": 3.05283,
+      "rate_preferential": 3.05283,
+      "origin_price": 1.0,
+      "dest_price": 3.469125,
+      "snapshot_time": "2026-10-25 09:47:14"
     },
-    "flyer_chile_CLP_PEN": {
-      "acquisition_rate": 0.003487023733427067,
-      "rate_standard": 0.003242932072087172,
-      "rate_preferential": 0.003267341238221162,
-      "origin_price": 999.2762500000001,
-      "dest_price": 3.4844999999999997
+    "flyer_zelle_USD_BOB": {
+      "acquisition_rate": 11.944999999999999,
+      "rate_standard": 10.5116,
+      "rate_preferential": 10.5116,
+      "origin_price": 1.0,
+      "dest_price": 11.944999999999999,
+      "snapshot_time": "2026-10-25 09:47:14"
     },
-    "flyer_chile_CLP_COP": {
-      "acquisition_rate": 3.1194714674745843,
-      "rate_standard": 2.901108464751363,
-      "rate_preferential": 2.9229447650236855,
-      "origin_price": 999.2762500000001,
-      "dest_price": 3117.21375
+    "flyer_zelle_USD_CLP": {
+      "acquisition_rate": 992.03,
+      "rate_standard": 872.9864,
+      "rate_preferential": 872.9864,
+      "origin_price": 1.0,
+      "dest_price": 992.03,
+      "snapshot_time": "2026-10-25 09:47:14"
     },
-    "flyer_chile_CLP_USD": {
-      "acquisition_rate": 0.001044756142257959,
-      "rate_standard": 0.0009716232122999019,
-      "rate_preferential": 0.0009789365052957077,
-      "origin_price": 999.2762500000001,
-      "dest_price": 1.044
+    "flyer_zelle_USD_ARS": {
+      "acquisition_rate": 1637.3975,
+      "rate_standard": 1440.9098000000001,
+      "rate_preferential": 1440.9098000000001,
+      "origin_price": 1.0,
+      "dest_price": 1637.3975,
+      "snapshot_time": "2026-10-25 09:47:14"
+    },
+    "flyer_mexico_MXN_VES": {
+      "acquisition_rate": 50.90053421521241,
+      "rate_standard": 47.337496820147535,
+      "rate_preferential": 47.69380055965403,
+      "origin_price": 19.655,
+      "dest_price": 1000.4499999999999,
+      "snapshot_time": "2026-10-25 09:47:14"
+    },
+    "flyer_mexico_MXN_COP": {
+      "acquisition_rate": 158.60633426609004,
+      "rate_standard": 147.50389086746372,
+      "rate_preferential": 148.61413520732637,
+      "origin_price": 19.655,
+      "dest_price": 3117.4075000000003,
+      "snapshot_time": "2026-10-25 09:47:14"
+    },
+    "flyer_mexico_MXN_CLP": {
+      "acquisition_rate": 50.472144492495545,
+      "rate_standard": 46.939094378020854,
+      "rate_preferential": 47.29239938946833,
+      "origin_price": 19.655,
+      "dest_price": 992.03,
+      "snapshot_time": "2026-10-25 09:47:14"
+    },
+    "flyer_mexico_MXN_USD": {
+      "acquisition_rate": 19.655,
+      "rate_standard": 21.227400000000003,
+      "rate_preferential": 21.227400000000003,
+      "origin_price": 19.655,
+      "dest_price": 1.0,
+      "snapshot_time": "2026-10-25 09:47:14"
+    },
+    "flyer_mexico_MXN_ARS": {
+      "acquisition_rate": 83.30691935894174,
+      "rate_standard": 77.47543500381582,
+      "rate_preferential": 78.05858343932842,
+      "origin_price": 19.655,
+      "dest_price": 1637.3975,
+      "snapshot_time": "2026-10-25 09:47:14"
+    },
+    "flyer_mexico_MXN_PEN": {
+      "acquisition_rate": 0.17650089035868735,
+      "rate_standard": 0.16414582803357922,
+      "rate_preferential": 0.16538133426609006,
+      "origin_price": 19.655,
+      "dest_price": 3.469125,
+      "snapshot_time": "2026-10-25 09:47:14"
     },
     "flyer_colombia_COP_VES": {
-      "acquisition_rate": 0.31752145747187055,
-      "rate_standard": 0.2952949554488396,
-      "rate_preferential": 0.2975176056511427,
-      "origin_price": 3147.505,
-      "dest_price": 999.4003749999999
+      "acquisition_rate": 0.3159550677122707,
+      "rate_standard": 0.2906786622952891,
+      "rate_preferential": 0.29320630283698723,
+      "origin_price": 3166.4312499999996,
+      "dest_price": 1000.4499999999999,
+      "snapshot_time": "2026-10-25 09:47:14"
+    },
+    "flyer_colombia_COP_USD": {
+      "acquisition_rate": 3166.4312499999996,
+      "rate_standard": 3419.74575,
+      "rate_preferential": 3419.74575,
+      "origin_price": 3166.4312499999996,
+      "dest_price": 1.0,
+      "snapshot_time": "2026-10-25 09:47:14"
     },
     "flyer_colombia_COP_CLP": {
-      "acquisition_rate": 0.3152794832732593,
-      "rate_standard": 0.2932099194441311,
-      "rate_preferential": 0.29541687582704396,
-      "origin_price": 3147.505,
-      "dest_price": 992.34375
-    },
-    "flyer_colombia_COP_PEN": {
-      "acquisition_rate": 0.001107067343816769,
-      "rate_standard": 0.0010295726297495952,
-      "rate_preferential": 0.0010373221011563127,
-      "origin_price": 3147.505,
-      "dest_price": 3.4844999999999997
+      "acquisition_rate": 0.31329592265740813,
+      "rate_standard": 0.2882322488448155,
+      "rate_preferential": 0.2907386162260747,
+      "origin_price": 3166.4312499999996,
+      "dest_price": 992.03,
+      "snapshot_time": "2026-10-25 09:47:14"
     },
     "flyer_colombia_COP_MXN": {
-      "acquisition_rate": 0.005913016818082895,
-      "rate_standard": 0.005499105640817092,
-      "rate_preferential": 0.005540496758543673,
-      "origin_price": 3147.505,
-      "dest_price": 18.611250000000002
+      "acquisition_rate": 0.005827933260827944,
+      "rate_standard": 0.005361698599961709,
+      "rate_preferential": 0.005408322066048332,
+      "origin_price": 3166.4312499999996,
+      "dest_price": 18.45375,
+      "snapshot_time": "2026-10-25 09:47:14"
+    },
+    "flyer_colombia_COP_PEN": {
+      "acquisition_rate": 0.0010955946067043143,
+      "rate_standard": 0.0010079470381679691,
+      "rate_preferential": 0.0010167117950216035,
+      "origin_price": 3166.4312499999996,
+      "dest_price": 3.469125,
+      "snapshot_time": "2026-10-25 09:47:14"
+    },
+    "flyer_chile_CLP_VES": {
+      "acquisition_rate": 1.00063261545232,
+      "rate_standard": 0.9305883323706575,
+      "rate_preferential": 0.9375927606788239,
+      "origin_price": 999.8175000000001,
+      "dest_price": 1000.4499999999999,
+      "snapshot_time": "2026-10-25 09:47:14"
+    },
+    "flyer_chile_CLP_PEN": {
+      "acquisition_rate": 0.0034697582308771346,
+      "rate_standard": 0.0032268751547157347,
+      "rate_preferential": 0.003251163462331875,
+      "origin_price": 999.8175000000001,
+      "dest_price": 3.469125,
+      "snapshot_time": "2026-10-25 09:47:14"
+    },
+    "flyer_chile_CLP_COP": {
+      "acquisition_rate": 3.117976530716856,
+      "rate_standard": 2.8997181735666757,
+      "rate_preferential": 2.921544009281694,
+      "origin_price": 999.8175000000001,
+      "dest_price": 3117.4075000000003,
+      "snapshot_time": "2026-10-25 09:47:14"
+    },
+    "flyer_chile_CLP_ARS": {
+      "acquisition_rate": 1.637696379589275,
+      "rate_standard": 1.5230576330180257,
+      "rate_preferential": 1.5345215076751506,
+      "origin_price": 999.8175000000001,
+      "dest_price": 1637.3975,
+      "snapshot_time": "2026-10-25 09:47:14"
+    },
+    "flyer_chile_CLP_BOB": {
+      "acquisition_rate": 0.011947180360415774,
+      "rate_standard": 0.011110877735186668,
+      "rate_preferential": 0.011194507997709581,
+      "origin_price": 999.8175000000001,
+      "dest_price": 11.944999999999999,
+      "snapshot_time": "2026-10-25 09:47:14"
+    },
+    "flyer_chile_CLP_USD": {
+      "acquisition_rate": 999.8175000000001,
+      "rate_standard": 1079.8029000000001,
+      "rate_preferential": 1079.8029000000001,
+      "origin_price": 999.8175000000001,
+      "dest_price": 1.0,
+      "snapshot_time": "2026-10-25 09:47:14"
+    },
+    "flyer_venezuela_VES_COP": {
+      "acquisition_rate": 3.090585467695422,
+      "rate_standard": 2.8742444849567423,
+      "rate_preferential": 2.8958785832306106,
+      "origin_price": 1008.678625,
+      "dest_price": 3117.4075000000003,
+      "snapshot_time": "2026-10-25 09:47:14"
+    },
+    "flyer_venezuela_VES_CLP": {
+      "acquisition_rate": 0.9834946190120762,
+      "rate_standard": 0.9146499956812308,
+      "rate_preferential": 0.9215344580143155,
+      "origin_price": 1008.678625,
+      "dest_price": 992.03,
+      "snapshot_time": "2026-10-25 09:47:14"
+    },
+    "flyer_venezuela_VES_PEN": {
+      "acquisition_rate": 0.003439276806326693,
+      "rate_standard": 0.0031985274298838243,
+      "rate_preferential": 0.003222602367528112,
+      "origin_price": 1008.678625,
+      "dest_price": 3.469125,
+      "snapshot_time": "2026-10-25 09:47:14"
+    },
+    "flyer_venezuela_VES_MXN": {
+      "acquisition_rate": 0.018294974774547244,
+      "rate_standard": 0.017014326540328938,
+      "rate_preferential": 0.01714239136375077,
+      "origin_price": 1008.678625,
+      "dest_price": 18.45375,
+      "snapshot_time": "2026-10-25 09:47:14"
+    },
+    "flyer_venezuela_VES_BOB": {
+      "acquisition_rate": 0.011842225763433818,
+      "rate_standard": 0.01101326995999345,
+      "rate_preferential": 0.011096165540337488,
+      "origin_price": 1008.678625,
+      "dest_price": 11.944999999999999,
+      "snapshot_time": "2026-10-25 09:47:14"
+    },
+    "flyer_venezuela_VES_ARS": {
+      "acquisition_rate": 1.623309406402857,
+      "rate_standard": 1.509677747954657,
+      "rate_preferential": 1.5210409137994771,
+      "origin_price": 1008.678625,
+      "dest_price": 1637.3975,
+      "snapshot_time": "2026-10-25 09:47:14"
     }
   }
 }
