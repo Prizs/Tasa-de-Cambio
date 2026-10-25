@@ -7,6 +7,8 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 
+import threading
+import requests
 import calculator_service
 from calculator_service import compute_all_rates, save_snapshot, load_config, save_config, load_snapshot
 from telegram_service import send_telegram_message, send_telegram_photo
@@ -25,10 +27,38 @@ app.add_middleware(
 os.makedirs("static", exist_ok=True)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
+def keep_alive_worker():
+    """Background worker that pings this service every 9 minutes to prevent Render from sleeping."""
+    time.sleep(20)
+    while True:
+        url = os.environ.get("RENDER_EXTERNAL_URL", "https://tasa-de-cambio-0yij.onrender.com")
+        if url:
+            target = f"{url.rstrip('/')}/health"
+            try:
+                r = requests.get(target, timeout=10)
+                print(f"[KeepAlive] Self ping exitoso a {target} -> HTTP {r.status_code}")
+            except Exception as e:
+                print(f"[KeepAlive] Aviso al autoping: {e}")
+        time.sleep(540)  # Ping every 9 minutes (Render sleeps at 15 minutes)
+
+@app.on_event("startup")
+def start_keep_alive():
+    t = threading.Thread(target=keep_alive_worker, daemon=True)
+    t.start()
+
 @app.get("/")
 def get_index():
     with open(os.path.join("static", "index.html"), "r", encoding="utf-8") as f:
         return HTMLResponse(f.read())
+
+@app.head("/")
+def head_index():
+    return HTMLResponse("")
+
+@app.get("/health")
+@app.head("/health")
+def health_check():
+    return {"status": "ok", "time": time.time()}
 
 @app.get("/api/rates")
 def get_live_rates():
