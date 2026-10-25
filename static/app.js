@@ -711,8 +711,8 @@ async function sendAllFlyersToTelegram() {
       window.FlyerRenderer.renderToCanvas(offCanvas, f, 2.0);
       const dataUrl = offCanvas.toDataURL("image/png");
 
-      let summaryList = f.corridors.map(c => `• ${c.destination_fiat} (${c.name}): <b>${c.rate_standard}</b>`).join("\n");
-      const caption = `📊 <b>${f.title} - Envíos YA!</b>\n\n${summaryList}\n\n📲 <i>WhatsApp: ${f.whatsapp || "+56 973614725"}</i>`;
+      let summaryList = f.corridors.map(c => `* ${c.destination_fiat} (${c.name}): <b>${formatNumber(c.rate_standard)}</b>`).join("\n");
+      const caption = `📊 <b>${f.title} - Envíos YA!</b>\n\n${summaryList}\n\n<b>*Consultar cuenta antes de transferir*</b>\n📲 WhatsApp: ${f.whatsapp || "+56 973614725"}`;
 
       const res = await fetch("/api/telegram/send-photo", {
         method: "POST",
@@ -767,8 +767,8 @@ async function sendAllFlyersToWhatsApp() {
       window.FlyerRenderer.renderToCanvas(offCanvas, f, 2.0);
       const dataUrl = offCanvas.toDataURL("image/png");
 
-      let summaryList = f.corridors.map(c => `• ${c.destination_fiat} (${c.name}): *${formatNumber(c.rate_standard)}*`).join("\n");
-      const caption = `📊 *${f.title} - Envíos YA!*\n\n${summaryList}\n\n📲 _WhatsApp: ${f.whatsapp || "+56 973614725"}_`;
+      let summaryList = f.corridors.map(c => `* ${c.destination_fiat} (${c.name}): ${formatNumber(c.rate_standard)}`).join("\n");
+      const caption = `📊 *${f.title} - Envíos YA!*\n\n${summaryList}\n\n*Consultar cuenta antes de transferir*\n📲 WhatsApp: ${f.whatsapp || "+56 973614725"}`;
 
       const res = await fetch("/api/whatsapp/send-photo", {
         method: "POST",

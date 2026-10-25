@@ -134,31 +134,30 @@ const FlyerRenderer = {
     ctx.fillText(flyer.min_amount_text || "MINIMO 20$", (w - 75 * s), 255 * s);
     ctx.restore();
 
-    // Promotional Headline: "ENVÍA DINERO A TU FAMILIA"
+    // Promotional Headline:
+    // Line 1: "ENVÍA DINERO A TU FAMILIA"
+    // Line 2: "SEGURO Y RESPONSABLE!"
+    // Line 3: "¡LA MEJOR TASA Y RAPIDEZ!"
     ctx.save();
     ctx.textAlign = "center";
-    ctx.font = `italic 900 ${38 * s}px "Arial Black", Impact, sans-serif`;
     ctx.fillStyle = "#F59E0B";
     ctx.shadowColor = "rgba(0,0,0,0.9)";
     ctx.shadowBlur = 10 * s;
-    ctx.fillText("ENVÍA", 310 * s, 320 * s);
 
-    // Underline below "ENVÍA"
-    ctx.fillRect(245 * s, 328 * s, 135 * s, 4.5 * s);
+    // Line 1: Cleanly centered
+    ctx.font = `italic 900 ${36 * s}px "Arial Black", Impact, sans-serif`;
+    ctx.fillText("ENVÍA DINERO A TU FAMILIA", w * 0.5, 320 * s);
 
-    ctx.font = `italic 800 ${30 * s}px "Arial Black", Impact, sans-serif`;
-    ctx.fillText("DINERO A TU FAMILIA", 530 * s, 320 * s);
-
-    // "SEGURO Y RESPONSABLE!"
-    ctx.font = `italic 900 ${40 * s}px "Arial Black", Impact, sans-serif`;
+    // Line 2: SEGURO Y RESPONSABLE!
+    ctx.font = `italic 900 ${38 * s}px "Arial Black", Impact, sans-serif`;
     ctx.fillText("SEGURO Y RESPONSABLE!", w * 0.5, 375 * s);
 
-    // Sub promo: "¡LA MEJOR TASA Y LA MAYOR RAPIDEZ!"
-    ctx.font = `italic 900 ${29 * s}px "Arial Black", Impact, sans-serif`;
+    // Line 3: ¡LA MEJOR TASA Y RAPIDEZ!
+    ctx.font = `italic 900 ${31 * s}px "Arial Black", Impact, sans-serif`;
     ctx.fillStyle = "#FBBF24";
     ctx.shadowColor = "#D97706";
-    ctx.shadowBlur = 4 * s;
-    ctx.fillText(flyer.sub_promo || "¡LA MEJOR TASA Y LA MAYOR RAPIDEZ!", w * 0.5, 435 * s);
+    ctx.shadowBlur = 5 * s;
+    ctx.fillText("¡LA MEJOR TASA Y RAPIDEZ!", w * 0.5, 432 * s);
     ctx.restore();
 
     return 465 * s;

@@ -32,13 +32,15 @@
       "subtitle": "THIS IS HOW MONEY MOVES",
       "min_amount_text": "MÍNIMO 20$",
       "promo_text": "ENVÍA DINERO A TU FAMILIA SEGURO Y RESPONSABLE!",
-      "sub_promo": "¡LA MEJOR TASA Y LA MAYOR RAPIDEZ!",
+      "sub_promo": "¡LA MEJOR TASA Y RAPIDEZ!",
       "whatsapp": "+56 973614725",
       "brand_name": "ENVÍOS YA!",
       "origin": {
         "fiat": "USD",
         "tradeType": "BUY",
-        "payTypes": ["Zelle"],
+        "payTypes": [
+          "Zelle"
+        ],
         "minAmount": 100,
         "flag": "usa",
         "fixed_rate": 1.0
@@ -119,13 +121,15 @@
       "subtitle": "ENVÍOS SEGUROS EN EFECTIVO OXXO",
       "min_amount_text": "MÍNIMO $200 MXN",
       "promo_text": "ENVÍA DINERO A TU FAMILIA SEGURO Y RESPONSABLE!",
-      "sub_promo": "¡LA MEJOR TASA EN EFECTIVO OXXO!",
+      "sub_promo": "¡LA MEJOR TASA Y RAPIDEZ!",
       "whatsapp": "+56 973614725",
       "brand_name": "ENVÍOS YA!",
       "origin": {
         "fiat": "MXN",
         "tradeType": "BUY",
-        "payTypes": ["OXXO"],
+        "payTypes": [
+          "OXXO"
+        ],
         "minAmount": 500,
         "flag": "mexico"
       },
@@ -205,14 +209,17 @@
       "badge_header": "Colombia Nequi/Bancolombia",
       "subtitle": "ENVÍOS AL INSTANTE POR NEQUI Y BANCOLOMBIA",
       "min_amount_text": "MÍNIMO $50.000 COP",
-      "promo_text": "¡ENVÍA SEGURO Y RÁPIDO CON ENVÍOS YA!",
-      "sub_promo": "¡TASA ESPECIAL AL 8% DEL CAMBIO!",
+      "promo_text": "ENVÍA DINERO A TU FAMILIA SEGURO Y RESPONSABLE!",
+      "sub_promo": "¡LA MEJOR TASA Y RAPIDEZ!",
       "whatsapp": "+56 973614725",
       "brand_name": "ENVÍOS YA!",
       "origin": {
         "fiat": "COP",
         "tradeType": "BUY",
-        "payTypes": ["Nequi", "Bancolombia"],
+        "payTypes": [
+          "Nequi",
+          "Bancolombia"
+        ],
         "minAmount": 350000,
         "flag": "colombia"
       },
@@ -282,7 +289,7 @@
       "subtitle": "ENVÍOS DIRECTOS Y RÁPIDOS",
       "min_amount_text": "MÍNIMO $10.000 CLP",
       "promo_text": "ENVÍA DINERO A TU FAMILIA SEGURO Y RESPONSABLE!",
-      "sub_promo": "¡TASA ESPECIAL A PARTIR DE 100.000 CLP!",
+      "sub_promo": "¡LA MEJOR TASA Y RAPIDEZ!",
       "whatsapp": "+56 973614725",
       "brand_name": "ENVÍOS YA!",
       "origin": {
@@ -369,13 +376,16 @@
       "subtitle": "TRANSFERENCIAS INMEDIATAS VES",
       "min_amount_text": "MÍNIMO 100 BS",
       "promo_text": "ENVÍA DINERO A TU FAMILIA SEGURO Y RESPONSABLE!",
-      "sub_promo": "¡LA MEJOR TASA EN BOLÍVARES!",
+      "sub_promo": "¡LA MEJOR TASA Y RAPIDEZ!",
       "whatsapp": "+56 973614725",
       "brand_name": "ENVÍOS YA!",
       "origin": {
         "fiat": "VES",
         "tradeType": "BUY",
-        "payTypes": ["PagoMovil", "Banesco"],
+        "payTypes": [
+          "PagoMovil",
+          "Banesco"
+        ],
         "minAmount": 1000,
         "flag": "venezuela"
       },
