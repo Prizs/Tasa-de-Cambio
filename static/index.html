@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora de Tasas P2P & Generador de Flyers - Envíos YA!</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- JSZip for multi-download -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Navigation Bar -->
+    <header class="navbar">
+      <div class="brand-zone">
+        <div class="brand-logo-icon">⚡</div>
+        <div>
+          <h1 class="brand-title">ENVÍOS YA! <span>P2P Rates Engine</span></h1>
+          <p class="brand-subtitle">Cálculo automatizado con libro de órdenes Binance P2P</p>
+        </div>
+      </div>
+
+      <div class="actions-zone">
+        <div class="sync-status" id="syncStatus">
+          <span class="pulse-dot"></span>
+          <span id="syncText">Sincronizado</span>
+          <span class="countdown-badge" id="countdownBadge">60s</span>
+        </div>
+
+        <button class="btn btn-secondary" id="btnRefresh" title="Actualizar tasas de Binance ahora">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.19"/></svg>
+          Actualizar Tasas
+        </button>
+
+        <button class="btn btn-primary" id="btnDownloadAll">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+          Descargar (ZIP)
+        </button>
+
+        <button class="btn btn-outline" id="btnSendTelegramFlyers" style="border-color:#38bdf8; color:#38bdf8;" title="Publicar los 4 flyers al grupo de Telegram">
+          ✈️ Publicar en Telegram
+        </button>
+
+        <button class="btn btn-outline" id="btnNotify" title="Activar notificaciones de escritorio">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span id="btnNotifyText">🔔 Activar Alertas</span>
+        </button>
+
+        <button class="btn btn-outline" id="btnOpenSettings" title="Configurar márgenes y filtros">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          Ajustes
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="main-container">
+      
+      <!-- Urgent Market Move Notification Banner -->
+      <div id="urgentAlertContainer"></div>
+
+      <!-- Market Drift / Profit Monitor Banner -->
+      <section class="drift-monitor-card" id="driftSection">
+        <div class="drift-header">
+          <div class="drift-title-box">
+            <span class="indicator-icon" id="driftIcon">🛡️</span>
+            <div>
+              <h3>Monitor de Variación y Protección de Margen</h3>
+              <p id="snapshotStatusText">Comparando tasas actuales contra el último flyer descargado...</p>
+            </div>
+          </div>
+          <div class="drift-action-box">
+            <button class="btn btn-sm btn-outline-light" id="btnSaveSnapshot" title="Establecer las tasas actuales como referencia base">
+              📌 Fijar Snapshot de Referencia
+            </button>
+          </div>
+        </div>
+
+        <div class="drift-grid" id="driftCardsContainer">
+          <!-- Populated dynamically via JS -->
+        </div>
+      </section>
+
+      <!-- Live Flyers Gallery Grid -->
+      <section class="flyers-section">
+        <div class="section-title-bar">
+          <div>
+            <h2>Flyers en Tiempo Real</h2>
+            <p>Se actualizan automáticamente con cada cambio de Binance. Listos para descargar en alta resolución.</p>
+          </div>
+          <div class="flyer-tabs" id="flyerTabs">
+            <!-- Tabs generated dynamically -->
+          </div>
+        </div>
+
+        <div class="flyers-gallery" id="flyersGallery">
+          <!-- Flyer cards populated dynamically -->
+        </div>
+      </section>
+
+      <!-- Detailed Rates & Market Depth Table -->
+      <section class="table-section">
+        <div class="section-title-bar">
+          <div>
+            <h2>Libro de Órdenes & Fórmulas Aplicadas</h2>
+            <p>Auditoría de los precios extraídos de Binance P2P, filtrados desde el 4to comerciante.</p>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Corredor</th>
+                <th>Compra USDT (Origen)</th>
+                <th>Venta USDT (Destino)</th>
+                <th>Tasa Adquisición</th>
+                <th>Tasa General (-7%)</th>
+                <th>Tasa Especial (-6.3%)</th>
+                <th>Variación Margen</th>
+                <th>Muestreo</th>
+              </tr>
+            </thead>
+            <tbody id="ratesTableBody">
+              <!-- Populated dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Modal for Order Book Inspection -->
+  <div class="modal" id="orderModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modalTitle">Comerciantes Muestreados en Binance</h3>
+        <button class="modal-close" id="modalClose">&times;</button>
+      </div>
+      <div class="modal-body" id="modalBody">
+        <!-- Content -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Drawer / Modal -->
+  <div class="modal" id="settingsModal">
+    <div class="modal-content modal-md">
+      <div class="modal-header">
+        <h3>Configuración de Tasas y Flyer</h3>
+        <button class="modal-close" id="settingsClose">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="settingsForm">
+          <div class="form-group">
+            <label>Margen General de Adquisición (%)</label>
+            <input type="number" step="0.1" id="cfgStandardMargin" value="7.0" class="form-control">
+            <small>Porcentaje que se resta a la tasa pura de adquisición para el cliente común.</small>
+          </div>
+
+          <div class="form-group">
+            <label>Margen Especial / Preferencial (%)</label>
+            <input type="number" step="0.1" id="cfgPrefMargin" value="6.3" class="form-control">
+            <small>Porcentaje que se resta a la tasa de adquisición para envíos mayores.</small>
+          </div>
+
+          <div class="form-group">
+            <label>Umbral Especial Chile (Pesos Chilenos)</label>
+            <input type="number" id="cfgClpThreshold" value="100000" class="form-control">
+            <small>Monto a partir del cual aplica la tasa preferencial.</small>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group col">
+              <label>Omitir primeros N anuncios</label>
+              <input type="number" id="cfgSkipTop" value="3" class="form-control">
+              <small>Recomendado: 3 para empezar a partir del 4to.</small>
+            </div>
+            <div class="form-group col">
+              <label>Cantidad de comerciantes a promediar</label>
+              <input type="number" id="cfgSampleCount" value="8" class="form-control">
+              <small>Promedio de liquidez real.</small>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Teléfono de Contacto WhatsApp</label>
+            <input type="text" id="cfgWhatsapp" value="+56 973614725" class="form-control">
+          </div>
+
+          <div class="form-group">
+            <label>Nombre de Marca en el Flyer</label>
+            <input type="text" id="cfgBrandName" value="ENVÍOS YA!" class="form-control">
+          </div>
+
+          <hr style="border-color: rgba(255,255,255,0.08); margin: 1.5rem 0;">
+          <h4 style="color: #38bdf8; margin-bottom: 0.85rem; display: flex; align-items: center; gap: 8px;">
+            <span>🤖 Bot de Telegram (Alertas Gratis en Grupo)</span>
+          </h4>
+          <div class="form-group">
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: #f1f5f9; font-weight: 600;">
+              <input type="checkbox" id="cfgTgEnabled"> Activar Alertas Automáticas al Grupo
+            </label>
+            <small>Avisa al grupo de tus compañeros cada vez que una tasa cambie y deban sacar nuevo flyer.</small>
+          </div>
+          <div class="form-group">
+            <label>Telegram Bot Token (de @BotFather)</label>
+            <input type="text" id="cfgTgToken" placeholder="123456789:ABCdefGhIJKlmNoPQRstuvwx" class="form-control">
+          </div>
+          <div class="form-group">
+            <label>Chat ID del Grupo</label>
+            <input type="text" id="cfgTgChatId" placeholder="-1001234567890" class="form-control">
+            <small>ID numérico de tu grupo de Telegram (ej. con @RawDataBot).</small>
+          </div>
+          <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
+            <button type="button" class="btn btn-outline btn-sm" id="btnTestTelegram">
+              🚀 Probar Mensaje en Telegram
+            </button>
+            <span id="tgTestResult" style="font-size: 0.8rem;"></span>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" id="btnCancelSettings">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="/static/flags.js"></script>
+  <script src="/static/flyer_renderer.js"></script>
+  <script src="/static/app.js"></script>
+</body>
+</html>
