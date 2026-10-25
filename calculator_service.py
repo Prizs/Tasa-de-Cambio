@@ -211,6 +211,11 @@ def compute_all_rates() -> Dict[str, Any]:
                 snap_entry = saved_rates[corridor_key]
                 old_acq = snap_entry.get("acquisition_rate", 0)
                 old_std = snap_entry.get("rate_standard", 0)
+
+                # Ignore stale snapshot from before origin_plus_percent was applied
+                if calc_mode == "origin_plus_percent" and old_std < 1.0:
+                    old_acq = 0
+
                 if old_acq > 0:
                     drift_acq_pct = ((acquisition_rate - old_acq) / old_acq) * 100
                     # Margin impact:

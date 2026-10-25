@@ -49,7 +49,9 @@ function setupEventListeners() {
     btnNotify.addEventListener("click", requestNotificationPermission);
   }
 
-  btnRefresh.addEventListener("click", () => {
+  btnRefresh.addEventListener("click", async () => {
+    // Manually clicking "Actualizar Tasas" syncs Binance, resets benchmark, and clears alert
+    await saveBenchmarkSnapshot(false, null);
     fetchRates(true);
   });
 
@@ -313,6 +315,9 @@ function renderDriftMonitor(data) {
             </div>
           </div>
           <div class="urgent-alert-actions" style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button class="btn btn-warning" onclick="saveBenchmarkSnapshot(true, null)" style="background:#f59e0b; border-color:#d97706; color:#000; font-weight:800;" title="Acepta las tasas actuales como nuevo punto de referencia y elimina este mensaje sin descargar">
+              🔄 Aceptar Tasas y Quitar Alerta
+            </button>
             <button class="btn btn-primary" onclick="downloadAllFlyersZip()" style="box-shadow: 0 4px 14px rgba(0,0,0,0.4);">
               📥 Descargar Nuevos Flyers (ZIP)
             </button>
