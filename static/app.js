@@ -66,6 +66,11 @@ function setupEventListeners() {
     downloadAllFlyersZip();
   });
 
+  const btnDownMobile = document.getElementById("btnDownloadMobile");
+  if (btnDownMobile) {
+    btnDownMobile.addEventListener("click", downloadAllFlyersMobile);
+  }
+
   btnOpenSettings.addEventListener("click", () => {
     openSettingsModal();
   });
@@ -135,11 +140,17 @@ function playAlertChime() {
 
 function triggerAlert(dangerCount, topRiskCorridors) {
   playAlertChime();
-  const alertMsg = `🚨 <b>¡ALERTA ENVÍOS YA! - Momento de Publicar Nuevas Tasas</b>\n\nEl mercado en Binance varió. Tienes <b>${dangerCount} corredor(es)</b> con pérdida de margen:\n• ${topRiskCorridors.join("\n• ")}\n\n👉 <i>Ingresa a la plataforma y descarga los nuevos flyers.</i>`;
+
+  const listText = topRiskCorridors.map(c => 
+    `• Moneda <b>[${c.origin_fiat}]</b>: Tasa de pérdida en el cambio de <b>${c.origin_fiat} ➔ ${c.dest_name}</b> del <b>${c.margin_diff}%</b>.`
+  ).join("\n");
+
+  const alertMsg = `⚠️ <b>¡TIENES QUE ACTUALIZAR LA TASA DE CAMBIO!</b>\n\nEl mercado en Binance varió. Tienes <b>${dangerCount} tasa(s)</b> con caída de margen superior al -1.8%:\n\n${listText}\n\n🛡️ <i>Toma previsiones y publica los nuevos flyers para proteger tu ganancia.</i>\n👉 <a href="https://tasa-de-cambio-0yij.onrender.com">Abrir Panel y Descargar Flyers</a>`;
 
   if (notificationsEnabled) {
-    new Notification("🚨 ¡Alerta Envíos YA! - Publicar Nuevas Tasas", {
-      body: `El mercado en Binance varió en: ${topRiskCorridors.join(", ")}. Descarga nuevos flyers.`,
+    const summary = topRiskCorridors.map(c => `${c.origin_fiat}➔${c.dest_name} (${c.margin_diff}%)`).join(", ");
+    new Notification("⚠️ ¡Tienes que actualizar la tasa de cambio!", {
+      body: `Pérdida de margen en: ${summary}. Toma previsiones.`,
       icon: "/static/favicon.ico"
     });
   }
@@ -197,6 +208,7 @@ function renderDashboard(data) {
   renderDriftMonitor(data);
   renderFlyersGallery(data.flyers);
   renderRatesTable(data.flyers);
+  renderExcelOrderbook(data);
 }
 
 // 1. Render Market Drift / Profit Margin Protection
@@ -224,7 +236,11 @@ function renderDriftMonitor(data) {
         const d = corridor.drift;
         if (d.status === "danger") {
           dangerCount++;
-          topRiskCorridors.push(`${flyer.origin.fiat}➔${corridor.name}`);
+          topRiskCorridors.push({
+            origin_fiat: flyer.origin.fiat,
+            dest_name: corridor.name,
+            margin_diff: d.margin_diff
+          });
         }
         if (d.status === "warning") warningCount++;
 
@@ -263,7 +279,9 @@ function renderDriftMonitor(data) {
   // Urgent Banner & Sound/Notification alert
   if (dangerCount > 0) {
     driftIcon.textContent = "🚨";
-    snapshotStatusText.innerHTML += ` <span style="color:#f87171; font-weight:700;">¡Atención! ${dangerCount} corredor(es) tienen riesgo de pérdida de margen comercial.</span>`;
+    snapshotStatusText.innerHTML += ` <span style="color:#f87171; font-weight:700;">¡Atención! ${dangerCount} corredor(es) tienen riesgo de pérdida de margen comercial mayor al -1.8%.</span>`;
+
+    const riskSummary = topRiskCorridors.slice(0, 3).map(c => `${c.origin_fiat}➔${c.dest_name} (${c.margin_diff}%)`).join(", ");
 
     if (urgentAlertContainer) {
       urgentAlertContainer.innerHTML = `
@@ -271,15 +289,18 @@ function renderDriftMonitor(data) {
           <div class="urgent-alert-content">
             <div class="urgent-alert-icon">⚠️</div>
             <div>
-              <div class="urgent-alert-title">¡MOMENTO DE PUBLICAR NUEVAS TASAS!</div>
+              <div class="urgent-alert-title">¡TIENES QUE ACTUALIZAR LA TASA DE CAMBIO!</div>
               <div class="urgent-alert-subtitle">
-                El mercado en Binance varió. Tienes <strong>${dangerCount} corredor(es)</strong> donde tu ganancia está cayendo: ${topRiskCorridors.slice(0, 3).join(", ")}.
+                El mercado en Binance varió. Tienes <strong>${dangerCount} tasa(s)</strong> con caída de margen superior al -1.8%: ${riskSummary}.
               </div>
             </div>
           </div>
-          <div class="urgent-alert-actions">
+          <div class="urgent-alert-actions" style="display:flex; gap:10px; flex-wrap:wrap;">
             <button class="btn btn-primary" onclick="downloadAllFlyersZip()" style="box-shadow: 0 4px 14px rgba(0,0,0,0.4);">
-              📥 Descargar Nuevos Flyers (ZIP) & Actualizar
+              📥 Descargar Nuevos Flyers (ZIP)
+            </button>
+            <button class="btn btn-success" onclick="downloadAllFlyersMobile()" style="background:#10b981; border-color:#059669; color:#fff;">
+              📱 Descargar Fotos (Móvil)
             </button>
           </div>
         </div>
@@ -319,14 +340,14 @@ function renderFlyersGallery(flyers) {
     let alertRibbonHtml = "";
     let statusBadgeHtml = '<span class="flyer-status-badge safe">✅ Al día</span>';
     let downloadBtnClass = "btn btn-primary btn-sm";
-    let downloadBtnText = "📥 Descargar PNG HD";
+    let downloadBtnText = "📥 Guardar Foto (PNG)";
 
     if (hasDanger) {
       cardClass = "flyer-card needs-update";
       alertRibbonHtml = `<div class="flyer-alert-ribbon">‼️ ¡DESCARGAR NUEVO! Tasa caída</div>`;
       statusBadgeHtml = `<span class="flyer-status-badge danger">‼️ Requiere Actualizar</span>`;
       downloadBtnClass = "btn btn-danger btn-sm btn-pulse";
-      downloadBtnText = "‼️ Descargar PNG HD";
+      downloadBtnText = "‼️ Guardar Foto (PNG)";
     } else if (hasWarning) {
       cardClass = "flyer-card warning-update";
       statusBadgeHtml = `<span class="flyer-status-badge warning">⚠️ Volatilidad</span>`;
@@ -796,3 +817,198 @@ function formatNumber(val, decimals = 2) {
 function formatDate(d) {
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}_${String(d.getHours()).padStart(2,'0')}${String(d.getMinutes()).padStart(2,'0')}`;
 }
+
+function escapeHtml(str) {
+  if (!str) return "";
+  return String(str).replace(/[&<>"']/g, function(m) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m];
+  });
+}
+
+// -------------------------------------------------------------
+// Excel-Style Order Book Tables (Comerciantes Compra y Venta)
+// -------------------------------------------------------------
+let selectedExcelFiat = "VES";
+
+function renderExcelOrderbook(data) {
+  const container = document.getElementById("excelTablesWrapper");
+  const tabsContainer = document.getElementById("excelFiatTabs");
+  if (!container || !tabsContainer || !data.orderbooks) return;
+
+  const fiats = ["VES", "COP", "CLP", "MXN", "PEN", "BOB", "ARS", "USD"];
+  if (!fiats.includes(selectedExcelFiat)) selectedExcelFiat = fiats[0];
+
+  tabsContainer.innerHTML = fiats.map(f => `
+    <button class="excel-tab-btn ${f === selectedExcelFiat ? 'active' : ''}" onclick="selectExcelFiat('${f}')">
+      ${getFlagEmoji(f)} ${f}
+    </button>
+  `).join("");
+
+  const ob = data.orderbooks[selectedExcelFiat] || { buy: [], sell: [], avg_buy: 0, avg_sell: 0 };
+
+  const renderTableRows = (list) => {
+    if (!list || list.length === 0) {
+      return `<tr><td colspan="6" style="text-align:center; color:#94a3b8; padding:20px;">Sin comerciantes disponibles</td></tr>`;
+    }
+    return list.map((m, idx) => `
+      <tr>
+        <td style="color:#64748b; font-weight:700;">${idx + 1}</td>
+        <td style="font-weight:600; color:#f8fafc;">${escapeHtml(m.nickName || 'Anónimo')}</td>
+        <td class="excel-price-cell">${formatNumber(m.price)} ${selectedExcelFiat}</td>
+        <td class="excel-rate-cell">${m.monthOrders || 0} ord. (${m.finishRate || 100}%)</td>
+        <td style="color:#cbd5e1;">${m.minAmount ? Number(m.minAmount).toLocaleString() : '--'}</td>
+        <td style="color:#cbd5e1;">${m.maxAmount ? Number(m.maxAmount).toLocaleString() : '--'}</td>
+      </tr>
+    `).join("");
+  };
+
+  container.innerHTML = `
+    <!-- Tabla COMPRA -->
+    <div class="excel-box">
+      <div class="excel-box-header buy">
+        <span>🟢 Comerciantes de COMPRA USDT (${selectedExcelFiat})</span>
+        <span style="font-size:0.75rem; color:#94a3b8;">Promedio: <strong style="color:#34d399;">${formatNumber(ob.avg_buy)} ${selectedExcelFiat}</strong></span>
+      </div>
+      <div class="excel-table-container">
+        <table class="excel-grid-table">
+          <thead>
+            <tr>
+              <th style="width:30px;">#</th>
+              <th>Comerciante</th>
+              <th>Precio Compra</th>
+              <th>Órdenes / Éxito</th>
+              <th>Mínimo</th>
+              <th>Máximo</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${renderTableRows(ob.buy)}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Tabla VENTA -->
+    <div class="excel-box">
+      <div class="excel-box-header sell">
+        <span>🔴 Comerciantes de VENTA USDT (${selectedExcelFiat})</span>
+        <span style="font-size:0.75rem; color:#94a3b8;">Promedio: <strong style="color:#f87171;">${formatNumber(ob.avg_sell)} ${selectedExcelFiat}</strong></span>
+      </div>
+      <div class="excel-table-container">
+        <table class="excel-grid-table">
+          <thead>
+            <tr>
+              <th style="width:30px;">#</th>
+              <th>Comerciante</th>
+              <th>Precio Venta</th>
+              <th>Órdenes / Éxito</th>
+              <th>Mínimo</th>
+              <th>Máximo</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${renderTableRows(ob.sell)}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+window.selectExcelFiat = function(fiat) {
+  selectedExcelFiat = fiat;
+  if (currentRatesData) renderExcelOrderbook(currentRatesData);
+};
+
+// -------------------------------------------------------------
+// Descarga Móvil: Fotos Individuales Directas (Sin ZIP)
+// -------------------------------------------------------------
+async function downloadAllFlyersMobile() {
+  if (!currentRatesData || !currentRatesData.flyers) {
+    alert("No hay tasas cargadas todavía.");
+    return;
+  }
+
+  const flyers = currentRatesData.flyers;
+  const btn = document.getElementById("btnDownloadMobile");
+  const origText = btn ? btn.innerHTML : "";
+  if (btn) btn.innerHTML = "⏳ Generando fotos...";
+
+  try {
+    const filesToShare = [];
+
+    for (let i = 0; i < flyers.length; i++) {
+      const flyer = flyers[i];
+      const offscreen = document.createElement("canvas");
+      const highResScale = 1.0;
+      window.FlyerRenderer.renderToCanvas(offscreen, flyer, highResScale);
+
+      const blob = await new Promise(resolve => offscreen.toBlob(resolve, "image/png"));
+      const flyerName = flyer.id ? flyer.id.replace('flyer_', '').toUpperCase() : `FLYER_${i+1}`;
+      const fileName = `Flyer_${flyerName}_${new Date().toISOString().slice(0, 10)}.png`;
+
+      // Check Web Share with files support (iOS Safari & Android Chrome)
+      if (navigator.canShare && navigator.canShare({ files: [new File([blob], fileName, { type: "image/png" })] })) {
+        filesToShare.push(new File([blob], fileName, { type: "image/png" }));
+      } else {
+        // Direct individual sequential download
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        await new Promise(r => setTimeout(r, 400));
+      }
+    }
+
+    if (filesToShare.length > 0 && navigator.share) {
+      try {
+        await navigator.share({
+          title: "Flyers de Tasas de Cambio - Envíos YA!",
+          text: "Tasas del día actualizadas",
+          files: filesToShare
+        });
+      } catch (err) {
+        if (err.name !== "AbortError") {
+          for (let f of filesToShare) {
+            const url = URL.createObjectURL(f);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = f.name;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            await new Promise(r => setTimeout(r, 350));
+          }
+        }
+      }
+    }
+
+    // Save benchmark snapshot
+    fetch("/api/snapshot/save", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({})
+    }).then(r => r.json()).then(res => {
+      if (res.snapshot && currentRatesData) {
+        currentRatesData.snapshot_info = {
+          has_snapshot: true,
+          snapshot_time: res.snapshot.readable_time,
+          snapshot_age_seconds: 0
+        };
+        fetchRates(false);
+      }
+    });
+
+  } catch (err) {
+    console.error("Error al descargar fotos móviles:", err);
+    alert("Error al descargar fotos.");
+  } finally {
+    if (btn) btn.innerHTML = origText;
+  }
+}
+window.downloadAllFlyersMobile = downloadAllFlyersMobile;
+

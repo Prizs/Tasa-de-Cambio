@@ -158,12 +158,13 @@
           "destination_fiat": "USD",
           "name": "Estados Unidos",
           "flag": "usa",
-          "tradeType": "SELL",
+          "tradeType": "BUY",
+          "calc_mode": "origin_plus_percent",
           "minAmount": 50,
           "payTypes": [],
-          "roundDecimals": 4,
-          "margin": 7.0,
-          "margin_pref": 6.3
+          "roundDecimals": 2,
+          "margin": 8.0,
+          "margin_pref": 8.0
         },
         {
           "destination_fiat": "ARS",
@@ -227,8 +228,8 @@
           "minAmount": 50,
           "payTypes": [],
           "roundDecimals": 0,
-          "margin": 10.0,
-          "margin_pref": 10.0
+          "margin": 8.0,
+          "margin_pref": 8.0
         },
         {
           "destination_fiat": "CLP",
@@ -347,8 +348,94 @@
           "minAmount": 50,
           "payTypes": [],
           "roundDecimals": 0,
-          "margin": 10.0,
-          "margin_pref": 10.0
+          "margin": 8.0,
+          "margin_pref": 8.0
+        }
+      ]
+    },
+    {
+      "id": "flyer_venezuela",
+      "title": "Venezuela (Pago Móvil / VES)",
+      "badge_header": "PAGO MÓVIL",
+      "subtitle": "TRANSFERENCIAS INMEDIATAS VES",
+      "min_amount_text": "MÍNIMO 100 BS",
+      "promo_text": "ENVÍA DINERO A TU FAMILIA SEGURO Y RESPONSABLE!",
+      "sub_promo": "¡LA MEJOR TASA EN BOLÍVARES!",
+      "whatsapp": "+56 973614725",
+      "brand_name": "ENVÍOS YA!",
+      "origin": {
+        "fiat": "VES",
+        "tradeType": "BUY",
+        "payTypes": ["PagoMovil", "Banesco"],
+        "minAmount": 1000,
+        "flag": "venezuela"
+      },
+      "corridors": [
+        {
+          "destination_fiat": "COP",
+          "name": "Colombia",
+          "flag": "colombia",
+          "tradeType": "SELL",
+          "minAmount": 350000,
+          "payTypes": [],
+          "roundDecimals": 2,
+          "margin": 7.0,
+          "margin_pref": 6.3
+        },
+        {
+          "destination_fiat": "CLP",
+          "name": "Chile",
+          "flag": "chile",
+          "tradeType": "SELL",
+          "minAmount": 100000,
+          "payTypes": [],
+          "roundDecimals": 2,
+          "margin": 7.0,
+          "margin_pref": 6.3
+        },
+        {
+          "destination_fiat": "PEN",
+          "name": "Perú",
+          "flag": "peru",
+          "tradeType": "SELL",
+          "minAmount": 300,
+          "payTypes": [],
+          "roundDecimals": 4,
+          "margin": 7.0,
+          "margin_pref": 6.3
+        },
+        {
+          "destination_fiat": "MXN",
+          "name": "México",
+          "flag": "mexico",
+          "tradeType": "SELL",
+          "minAmount": 2000,
+          "payTypes": [],
+          "roundDecimals": 4,
+          "margin": 7.0,
+          "margin_pref": 6.3
+        },
+        {
+          "destination_fiat": "BOB",
+          "name": "Bolivia",
+          "flag": "bolivia",
+          "tradeType": "SELL",
+          "minAmount": 500,
+          "payTypes": [],
+          "roundDecimals": 4,
+          "margin": 7.0,
+          "margin_pref": 6.3
+        },
+        {
+          "destination_fiat": "ARS",
+          "name": "Argentina",
+          "flag": "argentina",
+          "tradeType": "SELL",
+          "minAmount": 100000,
+          "payTypes": [],
+          "roundDecimals": 2,
+          "margin": 7.0,
+          "margin_pref": 6.3
         }
       ]
     }

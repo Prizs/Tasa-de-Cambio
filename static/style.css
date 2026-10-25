@@ -740,3 +740,137 @@ body {
   padding-top: 1rem;
   border-top: 1px solid var(--border-color);
 }
+
+/* Excel-style Order Book Section */
+.excel-orderbook-section {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  margin-top: 2rem;
+}
+
+.excel-fiat-tabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.excel-tab-btn {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  padding: 6px 14px;
+  border-radius: var(--radius-md);
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.excel-tab-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+.excel-tab-btn.active {
+  background: #2563eb;
+  border-color: #3b82f6;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4);
+}
+
+.excel-tables-wrapper {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-top: 1.25rem;
+}
+
+@media (max-width: 900px) {
+  .excel-tables-wrapper {
+    grid-template-columns: 1fr;
+  }
+}
+
+.excel-box {
+  background: #0b1120;
+  border: 1px solid #1e293b;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.excel-box-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  font-weight: 800;
+  font-size: 0.9rem;
+  border-bottom: 1px solid #1e293b;
+}
+
+.excel-box-header.buy {
+  background: rgba(16, 185, 129, 0.12);
+  color: #34d399;
+  border-bottom-color: rgba(16, 185, 129, 0.3);
+}
+
+.excel-box-header.sell {
+  background: rgba(239, 68, 68, 0.12);
+  color: #f87171;
+  border-bottom-color: rgba(239, 68, 68, 0.3);
+}
+
+.excel-table-container {
+  overflow-x: auto;
+}
+
+.excel-grid-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: "Consolas", "Courier New", monospace;
+  font-size: 0.82rem;
+}
+
+.excel-grid-table th {
+  background: #111827;
+  color: #94a3b8;
+  padding: 8px 10px;
+  text-align: left;
+  border-right: 1px solid #1f2937;
+  border-bottom: 1px solid #1f2937;
+  font-family: var(--font-family);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.excel-grid-table td {
+  padding: 8px 10px;
+  border-right: 1px solid #1f2937;
+  border-bottom: 1px solid #1f2937;
+  color: #e2e8f0;
+  white-space: nowrap;
+}
+
+.excel-grid-table tr:nth-child(even) {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.excel-grid-table tr:hover {
+  background: rgba(59, 130, 246, 0.1);
+}
+
+.excel-price-cell {
+  font-weight: 700;
+  color: #fbbf24;
+}
+
+.excel-rate-cell {
+  color: #38bdf8;
+}
+

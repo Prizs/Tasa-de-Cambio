@@ -73,6 +73,11 @@ def compute_all_rates() -> Dict[str, Any]:
 
     # Parallel pre-fetch all necessary order books to make execution ultra-fast (~1s)
     queries_to_fetch = set()
+    all_fiats = ["VES", "COP", "CLP", "MXN", "PEN", "BOB", "ARS"]
+    for f in all_fiats:
+        queries_to_fetch.add((f, "BUY", None, ()))
+        queries_to_fetch.add((f, "SELL", None, ()))
+
     for flyer in flyers:
         orig = flyer["origin"]
         if not (orig.get("fixed_rate") is not None or orig["fiat"] == "USD"):
@@ -93,7 +98,7 @@ def compute_all_rates() -> Dict[str, Any]:
                 ))
 
     if queries_to_fetch:
-        with ThreadPoolExecutor(max_workers=8) as executor:
+        with ThreadPoolExecutor(max_workers=12) as executor:
             list(executor.map(
                 lambda q: fetch_p2p_order_book(q[0], q[1], q[2], list(q[3])),
                 queries_to_fetch
@@ -211,15 +216,31 @@ def compute_all_rates() -> Dict[str, Any]:
                     # Margin impact:
                     # If market acquisition rate drops while we published a higher customer rate,
                     # our profit margin shrinks (risk!).
-                    # If market acquisition rate rises, our profit margin expands.
-                    effective_margin_now = ((acquisition_rate - old_std) / acquisition_rate) * 100 if acquisition_rate > 0 else 0
+                    if calc_mode == "origin_plus_percent":
+                        # We charge old_std in domestic currency per 1 USD
+                        # Real cost to buy 1 USD is now origin_price
+                        effective_margin_now = ((old_std - origin_price) / origin_price) * 100 if origin_price > 0 else 0
+                    else:
+                        effective_margin_now = ((acquisition_rate - old_std) / acquisition_rate) * 100 if acquisition_rate > 0 else 0
+
+                    margin_diff = effective_margin_now - margin_std
+
+                    # User requirement:
+                    # Exigencia de notificar/actualizar cuando exista una caída mayor al -1.8% de pérdida
+                    if margin_diff < -1.8:
+                        drift_status = "danger"
+                    elif margin_diff < -0.8:
+                        drift_status = "warning"
+                    else:
+                        drift_status = "safe"
+
                     drift_data = {
                         "old_rate_standard": old_std,
                         "drift_acq_pct": round(drift_acq_pct, 2),
                         "effective_margin_now": round(effective_margin_now, 2),
                         "nominal_margin": margin_std,
-                        "margin_diff": round(effective_margin_now - margin_std, 2),
-                        "status": "safe" if effective_margin_now >= (margin_std - 0.5) else ("warning" if effective_margin_now >= (margin_std - 1.5) else "danger")
+                        "margin_diff": round(margin_diff, 2),
+                        "status": drift_status
                     }
 
             computed_corridors.append({
@@ -237,7 +258,7 @@ def compute_all_rates() -> Dict[str, Any]:
                 "margin_pref": margin_pref,
                 "round_decimals": round_decimals,
                 "drift": drift_data,
-                "dest_merchants_sample": dest_calc.get("sampled_merchants", [])[:4]
+                "dest_merchants_sample": dest_calc.get("sampled_merchants", [])[:6]
             })
 
         results.append({
@@ -257,10 +278,51 @@ def compute_all_rates() -> Dict[str, Any]:
                 "minAmount": origin.get("minAmount"),
                 "payTypes": origin.get("payTypes"),
                 "origin_usdt_price": origin_price,
-                "sampled_merchants": origin_calc.get("sampled_merchants", [])[:4]
+                "sampled_merchants": origin_calc.get("sampled_merchants", [])[:6]
             },
             "corridors": computed_corridors
         })
+
+    # Assemble Excel-style Order Books for every currency (Buy & Sell)
+    orderbooks = {}
+    for f in ["VES", "COP", "CLP", "MXN", "PEN", "BOB", "ARS", "USD"]:
+        if f == "USD":
+            orderbooks["USD"] = {
+                "fiat": "USD",
+                "buy": [{
+                    "nickName": "Paridad Zelle 1:1",
+                    "price": 1.0,
+                    "finishRate": 100.0,
+                    "monthOrders": 9999,
+                    "minAmount": 1,
+                    "maxAmount": 999999
+                }],
+                "sell": [{
+                    "nickName": "Paridad Zelle 1:1",
+                    "price": 1.0,
+                    "finishRate": 100.0,
+                    "monthOrders": 9999,
+                    "minAmount": 1,
+                    "maxAmount": 999999
+                }],
+                "avg_buy": 1.0,
+                "avg_sell": 1.0
+            }
+            continue
+
+        buy_ads = fetch_p2p_order_book(fiat=f, trade_type="BUY")
+        buy_calc = calculate_effective_rate(buy_ads, skip_top=skip_top, sample_count=sample_count, min_finish_rate=min_finish, sample_mode=sample_mode)
+
+        sell_ads = fetch_p2p_order_book(fiat=f, trade_type="SELL")
+        sell_calc = calculate_effective_rate(sell_ads, skip_top=skip_top, sample_count=sample_count, min_finish_rate=min_finish, sample_mode=sample_mode)
+
+        orderbooks[f] = {
+            "fiat": f,
+            "buy": buy_calc.get("sampled_merchants", []),
+            "sell": sell_calc.get("sampled_merchants", []),
+            "avg_buy": buy_calc.get("price", 0.0),
+            "avg_sell": sell_calc.get("price", 0.0)
+        }
 
     return {
         "timestamp": time.time(),
@@ -271,5 +333,6 @@ def compute_all_rates() -> Dict[str, Any]:
             "snapshot_age_seconds": round(time.time() - snapshot.get("timestamp", time.time())) if snapshot.get("timestamp") else 0
         },
         "flyers": results,
+        "orderbooks": orderbooks,
         "_snapshot_payload": flat_rates_for_snapshot
     }
