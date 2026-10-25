@@ -222,12 +222,13 @@
           "destination_fiat": "USD",
           "name": "Estados Unidos",
           "flag": "usa",
-          "tradeType": "SELL",
+          "tradeType": "BUY",
+          "calc_mode": "origin_plus_percent",
           "minAmount": 50,
           "payTypes": [],
-          "roundDecimals": 6,
-          "margin": 8.0,
-          "margin_pref": 7.2
+          "roundDecimals": 0,
+          "margin": 10.0,
+          "margin_pref": 10.0
         },
         {
           "destination_fiat": "CLP",
@@ -316,17 +317,6 @@
           "margin_pref": 6.3
         },
         {
-          "destination_fiat": "USD",
-          "name": "Ecuador (USD)",
-          "flag": "ecuador",
-          "tradeType": "SELL",
-          "minAmount": 50,
-          "payTypes": [],
-          "roundDecimals": 4,
-          "margin": 7.0,
-          "margin_pref": 6.3
-        },
-        {
           "destination_fiat": "ARS",
           "name": "Argentina",
           "flag": "argentina",
@@ -347,6 +337,18 @@
           "roundDecimals": 4,
           "margin": 7.0,
           "margin_pref": 6.3
+        },
+        {
+          "destination_fiat": "USD",
+          "name": "Estados Unidos",
+          "flag": "usa",
+          "tradeType": "BUY",
+          "calc_mode": "origin_plus_percent",
+          "minAmount": 50,
+          "payTypes": [],
+          "roundDecimals": 0,
+          "margin": 10.0,
+          "margin_pref": 10.0
         }
       ]
     }

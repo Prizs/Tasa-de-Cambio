@@ -253,14 +253,42 @@ const FlyerRenderer = {
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
 
-    let rateStr = typeof rate === "number" ? (Number.isInteger(rate) ? rate.toString() : rate.toLocaleString("es-CL", { maximumFractionDigits: 5 })) : String(rate);
+    let rateStr = this.formatRateSmart(rate);
 
-    const fontSize = rateStr.length > 6 ? (24 * s) : (32 * s);
+    const fontSize = rateStr.length > 6 ? (22 * s) : (32 * s);
     ctx.font = `900 ${fontSize}px "Arial Black", sans-serif`;
     ctx.fillStyle = "#090d16";
     ctx.fillText(rateStr, (x1 + shaftEndX) * 0.5, y);
 
     ctx.restore();
+  },
+
+  formatRateSmart(val) {
+    if (val === undefined || val === null || val === "" || isNaN(val)) return "0";
+    const num = Number(val);
+    if (num === 0) return "0";
+
+    // Whole number (no .00)
+    if (Number.isInteger(num) || Math.abs(num - Math.round(num)) < 0.00001) {
+      return Math.round(num).toString();
+    }
+
+    // Number >= 1: max 3 decimals, strip trailing zeros
+    if (num >= 1) {
+      let s = num.toFixed(3);
+      return s.replace(/\.?0+$/, "");
+    }
+
+    // Number < 1: handle 0.000... keeping significant meaningful digits
+    const str8 = num.toFixed(8);
+    const match = str8.match(/^0\.(0+)/);
+    if (match) {
+      const zerosCount = match[1].length;
+      const decimals = Math.min(zerosCount + 3, 7);
+      return num.toFixed(decimals).replace(/\.?0+$/, "");
+    } else {
+      return num.toFixed(3).replace(/\.?0+$/, "");
+    }
   },
 
   drawHandIcon(ctx, x, y, size, direction) {

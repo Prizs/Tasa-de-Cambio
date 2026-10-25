@@ -347,7 +347,7 @@ function renderFlyersGallery(flyers) {
       corridorsListHtml += `
         <div class="flyer-corridor-item">
           <span>${getFlagEmoji(c.destination_fiat)} ${c.name} ${corridorBadge}</span>
-          <span style="font-weight:700; color:#fbbf24;">${c.rate_standard}</span>
+          <span style="font-weight:700; color:#fbbf24;">${window.FlyerRenderer ? window.FlyerRenderer.formatRateSmart(c.rate_standard) : c.rate_standard}</span>
         </div>
       `;
     });
@@ -786,8 +786,11 @@ function getFlagEmoji(fiat) {
 }
 
 function formatNumber(val, decimals = 2) {
-  if (val === undefined || val === null) return "--";
-  return Number(val).toLocaleString("es-CL", { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+  if (val === undefined || val === null || val === "") return "--";
+  if (window.FlyerRenderer && window.FlyerRenderer.formatRateSmart) {
+    return window.FlyerRenderer.formatRateSmart(val);
+  }
+  return Number(val).toString();
 }
 
 function formatDate(d) {

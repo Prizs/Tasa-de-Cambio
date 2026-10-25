@@ -170,19 +170,24 @@ def compute_all_rates() -> Dict[str, Any]:
                 )
                 dest_price = dest_calc["price"]
 
-            # Calculate Acquisition Rate (Tasa de Adquisición Pura)
-            # Example: VES (dest) / CLP (origin)
-            acquisition_rate = 0.0
-            if origin_price > 0 and dest_price > 0:
-                acquisition_rate = dest_price / origin_price
-
+            calc_mode = corridor.get("calc_mode", "standard")
             margin_std = corridor.get("margin", settings.get("default_margin_standard", 7.0))
             margin_pref = corridor.get("margin_pref", settings.get("default_margin_preferential", 6.3))
             round_decimals = corridor.get("roundDecimals", 2)
 
-            # Customer rates after deducting margin from acquisition rate
-            rate_standard = acquisition_rate * (1 - (margin_std / 100.0))
-            rate_preferential = acquisition_rate * (1 - (margin_pref / 100.0))
+            if calc_mode == "origin_plus_percent":
+                # Special rule: Origin Buy price + Margin % (e.g. COP + 10% or CLP + 10%)
+                # Displays how many pesos equal 1 USD
+                acquisition_rate = origin_price
+                rate_standard = origin_price * (1 + (margin_std / 100.0))
+                rate_preferential = origin_price * (1 + (margin_pref / 100.0))
+            else:
+                # Standard acquisition: Dest / Origin, deducting margin %
+                acquisition_rate = 0.0
+                if origin_price > 0 and dest_price > 0:
+                    acquisition_rate = dest_price / origin_price
+                rate_standard = acquisition_rate * (1 - (margin_std / 100.0))
+                rate_preferential = acquisition_rate * (1 - (margin_pref / 100.0))
 
             corridor_key = f"{flyer_id}_{origin['fiat']}_{dest_fiat}"
 
