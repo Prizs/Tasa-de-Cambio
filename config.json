@@ -15,6 +15,15 @@
     "chat_id": "-5399691025",
     "alert_on_danger": true
   },
+  "whatsapp": {
+    "enabled": true,
+    "api_url": "https://7107.api.greenapi.com",
+    "id_instance": "710722779999",
+    "api_token": "58568dbb33ab41afb8d911c46e9a7c94012dd1b7de964e2ab2",
+    "chat_id": "120363124330204015@g.us",
+    "group_name": "Envios Ya!",
+    "alert_on_danger": true
+  },
   "flyers": [
     {
       "id": "flyer_zelle",

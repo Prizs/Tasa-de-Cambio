@@ -261,12 +261,19 @@ def compute_all_rates() -> Dict[str, Any]:
                 "dest_merchants_sample": dest_calc.get("sampled_merchants", [])[:6]
             })
 
+        min_amount_display = flyer.get("min_amount_text")
+        if flyer_id == "flyer_venezuela" and origin_price > 0:
+            # Dynamic rule: Tasa de venta de 10 USDT en BS (10$ en BS)
+            min_bs = int(round(origin_price * 10))
+            min_formatted = f"{min_bs:,}".replace(",", ".")
+            min_amount_display = f"MÍNIMO {min_formatted} BS (10$)"
+
         results.append({
             "flyer_id": flyer_id,
             "title": flyer["title"],
             "badge_header": flyer.get("badge_header"),
             "subtitle": flyer.get("subtitle"),
-            "min_amount_text": flyer.get("min_amount_text"),
+            "min_amount_text": min_amount_display,
             "promo_text": flyer.get("promo_text"),
             "sub_promo": flyer.get("sub_promo"),
             "whatsapp": flyer.get("whatsapp"),

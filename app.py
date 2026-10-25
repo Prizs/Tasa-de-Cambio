@@ -13,6 +13,7 @@ import requests
 import calculator_service
 from calculator_service import compute_all_rates, save_snapshot, load_config, save_config, load_snapshot
 from telegram_service import send_telegram_message, send_telegram_photo
+from whatsapp_service import send_whatsapp_message, send_whatsapp_file
 
 def is_within_business_hours_vet() -> bool:
     """Checks if current time in Venezuela (UTC-4) is between 08:00 and 20:00."""
@@ -122,13 +123,32 @@ def notify_telegram_alert(payload: dict = Body(...)):
             "message": f"Alerta omitida: Fuera del horario permitido de Venezuela (8:00 AM a 8:00 PM). Hora actual: {now_str} VET."
         }
     cfg = load_config()
-    tg = cfg.get("telegram", {})
-    if not tg.get("enabled"):
-        return {"success": False, "message": "Telegram desactivado en ajustes"}
-    token = tg.get("bot_token")
-    chat_id = tg.get("chat_id")
     text = payload.get("text", "🚨 Alerta de volatilidad de mercado en Envíos YA!")
-    return send_telegram_message(token, chat_id, text)
+    
+    # 1. Send to Telegram
+    tg = cfg.get("telegram", {})
+    tg_res = {"success": False, "message": "Telegram no configurado"}
+    if tg.get("enabled"):
+        token = tg.get("bot_token")
+        chat_id = tg.get("chat_id")
+        tg_res = send_telegram_message(token, chat_id, text)
+
+    # 2. Send to WhatsApp (Green-API)
+    wa = cfg.get("whatsapp", {})
+    wa_res = {"success": False, "message": "WhatsApp no configurado"}
+    if wa.get("enabled"):
+        import re
+        text_wa = text.replace("<b>", "*").replace("</b>", "*").replace("<i>", "_").replace("</i>", "_")
+        text_wa = re.sub(r'<a\s+href="([^"]+)">([^<]+)</a>', r'\2 (\1)', text_wa)
+        wa_res = send_whatsapp_message(
+            api_url=wa["api_url"],
+            id_instance=wa["id_instance"],
+            api_token=wa["api_token"],
+            chat_id=wa["chat_id"],
+            message=text_wa
+        )
+
+    return {"telegram": tg_res, "whatsapp": wa_res}
 
 @app.post("/api/telegram/send-photo")
 def send_telegram_flyer_photo(payload: dict = Body(...)):
@@ -146,6 +166,32 @@ def send_telegram_flyer_photo(payload: dict = Body(...)):
     try:
         photo_bytes = base64.b64decode(image_base64)
         return send_telegram_photo(token, chat_id, photo_bytes, caption)
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+@app.post("/api/whatsapp/send-photo")
+def send_whatsapp_flyer_photo(payload: dict = Body(...)):
+    import base64
+    cfg = load_config()
+    wa = cfg.get("whatsapp", {})
+    if not wa.get("enabled"):
+        return {"success": False, "message": "WhatsApp desactivado"}
+    image_base64 = payload.get("image_base64", "")
+    caption = payload.get("caption", "📊 Flyer de Tasas - Envíos YA!")
+    file_name = payload.get("file_name", "Flyer_EnviosYa.png")
+    if image_base64.startswith("data:image"):
+        image_base64 = image_base64.split(",")[1]
+    try:
+        photo_bytes = base64.b64decode(image_base64)
+        return send_whatsapp_file(
+            api_url=wa["api_url"],
+            id_instance=wa["id_instance"],
+            api_token=wa["api_token"],
+            chat_id=wa["chat_id"],
+            file_bytes=photo_bytes,
+            file_name=file_name,
+            caption=caption
+        )
     except Exception as e:
         return {"success": False, "error": str(e)}
 

@@ -62,6 +62,11 @@ function setupEventListeners() {
     btnTgFlyers.addEventListener("click", sendAllFlyersToTelegram);
   }
 
+  const btnWaFlyers = document.getElementById("btnSendWhatsAppFlyers");
+  if (btnWaFlyers) {
+    btnWaFlyers.addEventListener("click", sendAllFlyersToWhatsApp);
+  }
+
   btnDownloadAll.addEventListener("click", () => {
     downloadAllFlyersZip();
   });
@@ -727,6 +732,68 @@ async function sendAllFlyersToTelegram() {
   } catch (err) {
     console.error("Error sending flyers to Telegram:", err);
     alert("Error de conexión al enviar a Telegram.");
+  } finally {
+    btn.innerHTML = originalText;
+    btn.disabled = false;
+  }
+}
+
+async function sendAllFlyersToWhatsApp() {
+  const btn = document.getElementById("btnSendWhatsAppFlyers");
+  if (!currentRatesData || !window.FlyerRenderer) return;
+
+  const cfgRes = await fetch("/api/config");
+  const cfg = await cfgRes.json();
+  const wa = cfg.whatsapp || {};
+
+  if (!wa.enabled || !wa.api_token || !wa.chat_id) {
+    alert("⚠️ WhatsApp no está configurado.");
+    return;
+  }
+
+  btn.disabled = true;
+  const originalText = btn.innerHTML;
+  btn.textContent = "Publicando...";
+
+  try {
+    const flyers = currentRatesData.flyers || [];
+    let sentCount = 0;
+
+    for (let i = 0; i < flyers.length; i++) {
+      const f = flyers[i];
+      btn.textContent = `Enviando (${i + 1}/${flyers.length})...`;
+
+      const offCanvas = document.createElement("canvas");
+      window.FlyerRenderer.renderToCanvas(offCanvas, f, 2.0);
+      const dataUrl = offCanvas.toDataURL("image/png");
+
+      let summaryList = f.corridors.map(c => `• ${c.destination_fiat} (${c.name}): *${formatNumber(c.rate_standard)}*`).join("\n");
+      const caption = `📊 *${f.title} - Envíos YA!*\n\n${summaryList}\n\n📲 _WhatsApp: ${f.whatsapp || "+56 973614725"}_`;
+
+      const res = await fetch("/api/whatsapp/send-photo", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          image_base64: dataUrl, 
+          caption: caption,
+          file_name: `Flyer_${f.id || i}.png`
+        })
+      });
+      const data = await res.json();
+      if (data.success) sentCount++;
+      // Pause slightly between WhatsApp uploads
+      await new Promise(r => setTimeout(r, 600));
+    }
+
+    if (sentCount > 0) {
+      alert(`✅ ¡Se publicaron ${sentCount} flyers exitosamente en tu grupo de WhatsApp (Envios Ya!)!`);
+      saveBenchmarkSnapshot(false, null);
+    } else {
+      alert("❌ No se pudieron enviar las fotos a WhatsApp. Revisa la conexión en Green-API.");
+    }
+  } catch (err) {
+    console.error("Error sending flyers to WhatsApp:", err);
+    alert("Error de conexión al enviar a WhatsApp.");
   } finally {
     btn.innerHTML = originalText;
     btn.disabled = false;
